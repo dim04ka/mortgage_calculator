@@ -38,6 +38,8 @@ export function expandOverpaymentPeriods(
   return [...byMonth.entries()].map(([month, amount]) => ({ month, amount }));
 }
 
+export type PaymentType = 'annuity' | 'differentiated';
+
 export type MortgageInput = {
   principal: number;
   totalMonths: number;
@@ -45,6 +47,7 @@ export type MortgageInput = {
   rateFirstYear: number;
   rateAfterward: number;
   overpayments: OverpaymentEntry[];
+  paymentType: PaymentType;
 };
 
 export type ScheduleSummary = {
@@ -75,6 +78,23 @@ function calculateAnnuityPayment(
   );
 }
 
+function calculateDifferentiatedPrincipal(
+  currentPrincipal: number,
+  monthsLeft: number,
+): number {
+  if (monthsLeft <= 0 || currentPrincipal <= 0) return 0;
+
+  return Number((currentPrincipal / monthsLeft).toFixed(2));
+}
+
+function getActiveMonthsRemaining(
+  totalMonths: number,
+  graceMonths: number,
+  month: number,
+): number {
+  return Math.max(1, totalMonths - Math.max(graceMonths, month));
+}
+
 function toOverpaymentMap(entries: OverpaymentEntry[]): Map<number, number> {
   return new Map(entries.map((entry) => [entry.month, entry.amount]));
 }
@@ -87,15 +107,21 @@ export function generateSchedule(input: MortgageInput): BelarusbankAnnuityRow[] 
     rateFirstYear,
     rateAfterward,
     overpayments,
+    paymentType,
   } = input;
 
   const overpaymentMap = toOverpaymentMap(overpayments);
   const schedule: BelarusbankAnnuityRow[] = [];
+  const activeMonths = totalMonths - graceMonths;
   let remainingDebt = principal;
   let currentRequiredAnnuity = calculateAnnuityPayment(
     principal,
-    totalMonths - graceMonths,
+    activeMonths,
     rateAfterward,
+  );
+  let currentPrincipalPortion = calculateDifferentiatedPrincipal(
+    principal,
+    activeMonths,
   );
 
   for (let month = 1; month <= totalMonths; month++) {
@@ -114,15 +140,26 @@ export function generateSchedule(input: MortgageInput): BelarusbankAnnuityRow[] 
     if (isGrace) {
       plannedTotal = interestPayment;
       plannedMainDebt = 0;
+    } else if (paymentType === 'annuity') {
+      if (
+        month === totalMonths ||
+        startDebt <= currentRequiredAnnuity - interestPayment
+      ) {
+        plannedMainDebt = startDebt;
+        plannedTotal = Number((plannedMainDebt + interestPayment).toFixed(2));
+      } else {
+        plannedTotal = currentRequiredAnnuity;
+        plannedMainDebt = Number((plannedTotal - interestPayment).toFixed(2));
+      }
     } else if (
       month === totalMonths ||
-      startDebt <= currentRequiredAnnuity - interestPayment
+      startDebt <= currentPrincipalPortion
     ) {
       plannedMainDebt = startDebt;
       plannedTotal = Number((plannedMainDebt + interestPayment).toFixed(2));
     } else {
-      plannedTotal = currentRequiredAnnuity;
-      plannedMainDebt = Number((plannedTotal - interestPayment).toFixed(2));
+      plannedMainDebt = currentPrincipalPortion;
+      plannedTotal = Number((plannedMainDebt + interestPayment).toFixed(2));
     }
 
     const extraPayment = overpaymentMap.get(month) || 0;
@@ -151,15 +188,24 @@ export function generateSchedule(input: MortgageInput): BelarusbankAnnuityRow[] 
     });
 
     if (actualExtraPayment > 0 && month < totalMonths) {
-      const activeMonthsRemaining = Math.max(
-        1,
-        totalMonths - Math.max(graceMonths, month),
+      const activeMonthsRemaining = getActiveMonthsRemaining(
+        totalMonths,
+        graceMonths,
+        month,
       );
-      currentRequiredAnnuity = calculateAnnuityPayment(
-        remainingDebt,
-        activeMonthsRemaining,
-        rateAfterward,
-      );
+
+      if (paymentType === 'annuity') {
+        currentRequiredAnnuity = calculateAnnuityPayment(
+          remainingDebt,
+          activeMonthsRemaining,
+          rateAfterward,
+        );
+      } else {
+        currentPrincipalPortion = calculateDifferentiatedPrincipal(
+          remainingDebt,
+          activeMonthsRemaining,
+        );
+      }
     }
   }
 

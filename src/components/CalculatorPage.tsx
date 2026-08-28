@@ -6,6 +6,7 @@ import {
   generateSchedule,
   summarizeSchedule,
   type OverpaymentPeriod,
+  type PaymentType,
 } from '../mortgage/mortgageCalculator';
 
 const StyledPage = styled.div`
@@ -65,6 +66,33 @@ const StyledSectionHeader = styled.div`
 
 const StyledSectionTitle = styled.h2`
   margin: 0;
+`;
+
+const StyledSwitch = styled.div`
+  display: flex;
+  width: fit-content;
+  padding: 4px;
+  gap: 4px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+`;
+
+const StyledSwitchButton = styled.button<{ $isActive: boolean }>`
+  border: 0;
+  border-radius: 8px;
+  background: ${({ $isActive }) => ($isActive ? 'var(--accent)' : 'transparent')};
+  color: ${({ $isActive }) => ($isActive ? '#fff' : 'var(--text-h)')};
+  font: inherit;
+  font-size: 14px;
+  padding: 8px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: ${({ $isActive }) =>
+      $isActive ? 'var(--accent)' : 'var(--accent-bg)'};
+  }
 `;
 
 const StyledHint = styled.p`
@@ -441,6 +469,7 @@ function PeriodAmountField({ amount, onChange }: PeriodAmountFieldProps) {
 
 export function CalculatorPage() {
   const [values, setValues] = useState<FormValues>(defaultValues);
+  const [paymentType, setPaymentType] = useState<PaymentType>('annuity');
   const [periods, setPeriods] = useState<OverpaymentPeriod[]>([]);
   const [fromMonth, setFromMonth] = useState('1');
   const [toMonth, setToMonth] = useState('12');
@@ -448,6 +477,7 @@ export function CalculatorPage() {
   const [overpayError, setOverpayError] = useState<string | null>(null);
 
   const error = getError(values);
+  const isAnnuity = paymentType === 'annuity';
 
   const parsedInput = useMemo(() => {
     if (error) return null;
@@ -459,8 +489,9 @@ export function CalculatorPage() {
       rateFirstYear: parseNumber(values.rateFirstYear),
       rateAfterward: parseNumber(values.rateAfterward),
       overpayments: expandOverpaymentPeriods(periods),
+      paymentType,
     };
-  }, [error, periods, values]);
+  }, [error, paymentType, periods, values]);
 
   const baseline = useMemo(() => {
     if (!parsedInput) return [];
@@ -559,13 +590,37 @@ export function CalculatorPage() {
       <StyledHeader>
         <StyledTitle>Калькулятор ипотеки</StyledTitle>
         <StyledSubtitle>
-          График аннуитета Беларусбанка: льготный год, затем пересчёт платежа при
-          досрочном погашении.
+          {isAnnuity
+            ? 'График аннуитета Беларусбанка: льготный год, затем равный платёж и пересчёт при досрочном погашении.'
+            : 'Дифференцированный график: льготный год, затем равные доли тела кредита и уменьшающиеся проценты.'}
         </StyledSubtitle>
       </StyledHeader>
 
       <StyledSection>
         <StyledSectionTitle>Параметры кредита</StyledSectionTitle>
+        <StyledField>
+          Тип графика
+          <StyledSwitch role="radiogroup" aria-label="Тип графика">
+            <StyledSwitchButton
+              type="button"
+              role="radio"
+              aria-checked={isAnnuity}
+              $isActive={isAnnuity}
+              onClick={() => setPaymentType('annuity')}
+            >
+              Аннуитет
+            </StyledSwitchButton>
+            <StyledSwitchButton
+              type="button"
+              role="radio"
+              aria-checked={!isAnnuity}
+              $isActive={!isAnnuity}
+              onClick={() => setPaymentType('differentiated')}
+            >
+              Дифференцированный
+            </StyledSwitchButton>
+          </StyledSwitch>
+        </StyledField>
         <StyledGrid>
           <StyledField>
             Сумма кредита, BYN
@@ -704,7 +759,11 @@ export function CalculatorPage() {
       {summary ? (
         <StyledSummaryGrid>
           <StyledStat>
-            <StyledStatLabel>Обязательный платёж после льготы</StyledStatLabel>
+            <StyledStatLabel>
+              {isAnnuity
+                ? 'Обязательный платёж после льготы'
+                : 'Первый платёж после льготы'}
+            </StyledStatLabel>
             <StyledStatValue>{formatMoney(summary.requiredAnnuity)} BYN</StyledStatValue>
           </StyledStat>
           <StyledStat>

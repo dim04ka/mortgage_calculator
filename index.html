@@ -4,10 +4,123 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Калькулятор ипотеки</title>
+    <meta name="theme-color" content="#aa3bff" />
+    <title>Калькулятор ипотеки онлайн — график платежей и досрочное погашение</title>
+    <meta
+      name="description"
+      content="Бесплатный калькулятор ипотеки: аннуитет и дифференцированные платежи, льготный период, график выплат и экономия при досрочном погашении. Расчёт в BYN, в том числе для Беларусбанка."
+    />
+    <meta
+      name="keywords"
+      content="калькулятор ипотеки, ипотечный калькулятор онлайн, график платежей по ипотеке, досрочное погашение ипотеки, аннуитетный платёж, дифференцированный платёж, калькулятор ипотеки беларусь, калькулятор ипотеки беларусбанк, льготный период ипотеки"
+    />
+    <meta name="author" content="Dmitry Suhotsky" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large" />
+    <meta name="googlebot" content="index, follow" />
+    <meta name="yandex" content="index, follow" />
+    <meta name="geo.region" content="BY" />
+    <link rel="canonical" href="%SITE_URL%" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ru_BY" />
+    <meta property="og:site_name" content="Калькулятор ипотеки" />
+    <meta
+      property="og:title"
+      content="Калькулятор ипотеки онлайн — график платежей и досрочное погашение"
+    />
+    <meta
+      property="og:description"
+      content="Бесплатный калькулятор ипотеки: аннуитет и дифференцированные платежи, льготный период, график выплат и экономия при досрочном погашении. Расчёт в BYN, в том числе для Беларусбанка."
+    />
+    <meta property="og:url" content="%SITE_URL%" />
+
+    <meta name="twitter:card" content="summary" />
+    <meta
+      name="twitter:title"
+      content="Калькулятор ипотеки онлайн — график платежей и досрочное погашение"
+    />
+    <meta
+      name="twitter:description"
+      content="Бесплатный калькулятор ипотеки: аннуитет и дифференцированные платежи, льготный период, график выплат и экономия при досрочном погашении. Расчёт в BYN, в том числе для Беларусбанка."
+    />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebApplication",
+            "name": "Калькулятор ипотеки",
+            "alternateName": "Ипотечный калькулятор",
+            "description": "Бесплатный калькулятор ипотеки: аннуитет и дифференцированные платежи, льготный период, график выплат и экономия при досрочном погашении. Расчёт в BYN, в том числе для Беларусбанка.",
+            "applicationCategory": "FinanceApplication",
+            "operatingSystem": "All",
+            "inLanguage": "ru",
+            "browserRequirements": "Requires JavaScript",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "BYN"
+            },
+            "featureList": [
+              "Аннуитетный график платежей",
+              "Дифференцированный график платежей",
+              "Льготный период и две ставки",
+              "Досрочное погашение по периодам",
+              "Расчёт экономии на процентах"
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Как рассчитать ипотеку онлайн?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Укажите сумму кредита, срок в месяцах, льготный период и процентные ставки. Калькулятор сразу покажет график платежей, переплату банку и итоговую сумму выплат."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Чем аннуитет отличается от дифференцированного платежа?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "При аннуитете ежемесячный платёж одинаковый. При дифференцированном графике тело кредита делится равными долями, а проценты уменьшаются: первые платежи выше, последние ниже."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Как учесть льготный период и досрочное погашение?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Задайте длительность льготного периода и две ставки: на льготный год и после него. Периоды досрочного погашения добавляются отдельно — калькулятор пересчитает срок, проценты и экономию."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Подходит ли калькулятор для ипотеки Беларусбанка?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Да. Аннуитетный график повторяет логику Беларусбанка: льготный год, затем равный платёж и пересчёт при досрочном погашении. Дифференцированный режим считает равные доли тела кредита."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <h1>Калькулятор ипотеки онлайн</h1>
+      <p>
+        Бесплатный калькулятор ипотеки: аннуитет и дифференцированные платежи,
+        льготный период, график выплат и экономия при досрочном погашении.
+        Расчёт в BYN, в том числе для Беларусбанка.
+      </p>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

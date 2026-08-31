@@ -8,6 +8,7 @@ import {
   type OverpaymentPeriod,
   type PaymentType,
 } from '../mortgage/mortgageCalculator';
+import { faqItems, seo } from '../seo';
 
 const StyledPage = styled.div`
   padding: 32px 24px 48px;
@@ -364,6 +365,30 @@ const StyledRow = styled.tr<{ $isGrace: boolean; $hasOverpay: boolean }>`
   }
 `;
 
+const StyledFaqList = styled.dl`
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+`;
+
+const StyledFaqItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+`;
+
+const StyledFaqQuestion = styled.dt`
+  margin: 0;
+  font-weight: 600;
+  color: var(--text-h);
+`;
+
+const StyledFaqAnswer = styled.dd`
+  margin: 0;
+  color: var(--text);
+`;
+
 const StyledFooter = styled.footer`
   margin-top: 8px;
   padding-top: 24px;
@@ -418,7 +443,7 @@ function getError(values: FormValues): string | null {
   if (graceMonths >= totalMonths) {
     return 'Льготный период должен быть меньше общего срока';
   }
-  if (!(rateFirstYear >= 0)) return 'Ставка первого года не может быть отрицательной';
+  if (!(rateFirstYear >= 0)) return 'Ставка льготного периода не может быть отрицательной';
   if (!(rateAfterward >= 0)) return 'Ставка после льготного периода не может быть отрицательной';
 
   return null;
@@ -589,11 +614,12 @@ export function CalculatorPage() {
     <StyledPage>
       <StyledHeader>
         <StyledTitle>Калькулятор ипотеки</StyledTitle>
-        <StyledSubtitle>
+        <StyledSubtitle>{seo.description}</StyledSubtitle>
+        <StyledHint>
           {isAnnuity
             ? 'График аннуитета Беларусбанка: льготный год, затем равный платёж и пересчёт при досрочном погашении.'
             : 'Дифференцированный график: льготный год, затем равные доли тела кредита и уменьшающиеся проценты.'}
-        </StyledSubtitle>
+        </StyledHint>
       </StyledHeader>
 
       <StyledSection>
@@ -658,7 +684,7 @@ export function CalculatorPage() {
             />
           </StyledField>
           <StyledField>
-            Ставка первого года, %
+            Ставка льготного периода, %
             <StyledInput
               type="number"
               min="0"
@@ -849,6 +875,18 @@ export function CalculatorPage() {
           </StyledTableWrap>
         </StyledSection>
       ) : null}
+
+      <StyledSection>
+        <StyledSectionTitle>Частые вопросы</StyledSectionTitle>
+        <StyledFaqList>
+          {faqItems.map((item) => (
+            <StyledFaqItem key={item.question}>
+              <StyledFaqQuestion>{item.question}</StyledFaqQuestion>
+              <StyledFaqAnswer>{item.answer}</StyledFaqAnswer>
+            </StyledFaqItem>
+          ))}
+        </StyledFaqList>
+      </StyledSection>
 
       <StyledFooter>
         Вопросы и правки:
